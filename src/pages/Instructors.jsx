@@ -19,12 +19,20 @@ function useStaggerReveal(count) {
             obs.disconnect();
           }
         },
-        { threshold: 0.08 }
+        { threshold: 0.01, rootMargin: '100px 0px 100px 0px' }
       );
       obs.observe(el);
       return obs;
     });
-    return () => observers.forEach(o => o?.disconnect());
+
+    const fallback = setTimeout(() => {
+      setVisibles(Array(count).fill(true));
+    }, 250);
+
+    return () => {
+      observers.forEach(o => o?.disconnect());
+      clearTimeout(fallback);
+    };
   }, [count]);
 
   const setRef = (i) => (el) => { refs.current[i] = el; };

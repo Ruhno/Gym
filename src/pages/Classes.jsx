@@ -28,10 +28,18 @@ function useSlotReveal() {
           }
         });
       },
-      { threshold: 0.08 }
+      { threshold: 0.01, rootMargin: '100px 0px 100px 0px' }
     );
     refs.current.forEach(el => el && obs.observe(el));
-    return () => obs.disconnect();
+
+    const fallback = setTimeout(() => {
+      setVisibles(Array(TIME_SLOTS.length).fill(true));
+    }, 250);
+
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
 
   const setRef = (i) => (el) => {

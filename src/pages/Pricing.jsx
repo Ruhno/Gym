@@ -20,10 +20,18 @@ function useStagger(count) {
           }
         });
       },
-      { threshold: 0.06 }
+      { threshold: 0.01, rootMargin: '100px 0px 100px 0px' }
     );
     refs.current.forEach(el => el && obs.observe(el));
-    return () => obs.disconnect();
+
+    const fallback = setTimeout(() => {
+      setVisibles(Array(count).fill(true));
+    }, 250);
+
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, [count]);
 
   const setRef = (i) => (el) => { refs.current[i] = el; if (el) el.dataset.idx = i; };
